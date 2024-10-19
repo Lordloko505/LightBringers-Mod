@@ -21,10 +21,10 @@ namespace LightBringers_Tribe
 			Instance = this;
 		}
 
-		public override string GUID => "lordloko505.wildfrost.LightbringersTribe";
+		public override string GUID => "lordloko505.wildfrost.LightBringers";
 		public override string[] Depends => new string[] { };
 		public override string Title => "Light Bringers";
-		public override string Description => "Adds the Light Bringers tribe to the game";
+		public override string Description => "W.I.P";
 
 		public static LightBringersTribe Instance;
 
@@ -34,6 +34,15 @@ namespace LightBringers_Tribe
 
 		private void CreateModAssets()
 		{
+			assets.Add(TribeCopy("Basic","Draw")
+				.WithFlag("Images/LightBringersFlag.png")
+				
+				
+				
+				
+				
+				
+				);
 			//Status Effects
 			//Status 0: Summon Graft Grunt
 			assets.Add(
@@ -94,10 +103,20 @@ namespace LightBringers_Tribe
 			);
 			Debug.Log("[LightBringers] On Hit Apply Scrap To RandomAlly Added");
 
+            //Status 5: Summon Tumble
+            assets.Add(
+                StatusCopy("Summon Fallow", "tumble")
+                .SubscribeToAfterAllBuildEvent(delegate (StatusEffectData data)
+                {
+                    ((StatusEffectSummon)data).summonCard = TryGet<CardData>("tumble");
+
+                })
+            );
+            Debug.Log("[Lightbringers] Summon Tumble"); //debug
 
             //Card Code
 
-			
+
             //Card 0: RadicalTerrance
             assets.Add(
 				new CardDataBuilder(this).CreateUnit("radicalTerrance", "Radical Terrance.")
@@ -153,7 +172,7 @@ namespace LightBringers_Tribe
 				.SetStats(3,2,2)
 				.WithCardType("Summoned")
 				.WithFlavour("Ima Gonna Getcha!")
-				);
+			);
 
 			//Card 3: John Buffm'n
 			assets.Add(
@@ -210,6 +229,37 @@ namespace LightBringers_Tribe
             );
 
 			//Card 7: Rough & Tumble
+			assets.Add(
+				new CardDataBuilder(this).CreateUnit("rough", "Rough")
+				.SetSprites("Rough.png", "Rough BG.png")
+				.SetStats(4, 1, 2)
+				.WithCardType("Friendly")
+				.SubscribeToAfterAllBuildEvent(delegate (CardData data)
+				{
+					data.startWithEffects = new CardData.StatusEffectStacks[]
+					{
+						SStack("Teeth",2),
+						SStack("On Turn Apply Teeth To Self",1)
+					};
+				})
+			);
+
+			assets.Add(
+				new CardDataBuilder(this).CreateUnit("tumble", "Tumble")
+				.SetSprites("Tumble.png","Tumble.png")
+				.SetStats(5,1,2)
+				.WithCardType("Summoned")
+				.SetTraits(TStack("Frontline",1))
+				.SubscribeToAfterAllBuildEvent(delegate (CardData data)
+				{
+					data.startWithEffects = new CardData.StatusEffectStacks[]
+					{
+						SStack("Teeth",1)
+					};
+				})
+			);
+
+
 
 			//Card 8: Tank
 			assets.Add(
@@ -227,7 +277,20 @@ namespace LightBringers_Tribe
 				})
 			);
 
-            //Card 9: The Boy
+			//Card 9: The Boy
+			assets.Add(
+				new CardDataBuilder(this).CreateUnit("theBoy", "The Boy")
+				.SetSprites("TheBoy.png", "TheBoy BG.png")
+				.SetStats(8, 1, 4)
+				.WithCardType("Friendly")
+				.SubscribeToAfterAllBuildEvent(delegate (CardData data)
+				{
+					data.startWithEffects = new CardData.StatusEffectStacks[]
+					{
+						SStack("When Hit Apply Spice To Self",3)
+					};
+				})
+			);
 
             //Card 10: Pullley
             assets.Add(
@@ -244,17 +307,18 @@ namespace LightBringers_Tribe
 						SStack("On Hit Equal Overload To Target",1)
 					};
 				})
-				);
+			);
 
 			//Card 11: Tangy
 			assets.Add(
 				new CardDataBuilder(this).CreateUnit("tangy", "Tangy")
 				.SetSprites("Tangy.png","Tangy BG.png")
 				.SetStats(5,2,3)
-				);
+			);
 
 			preLoaded = true;
 		}
+
 		protected override void Load()
 		{
 			if (!preLoaded) { CreateModAssets(); } //Builders arent made again upon 2nd load
@@ -299,6 +363,34 @@ namespace LightBringers_Tribe
 			return builder;
 		}
 
-	}
+        private CardDataBuilder CardCopy(string oldName, string newName)
+        {
+            CardData data = TryGet<CardData>(oldName).InstantiateKeepName();
+            data.name = GUID + "." + newName;
+            CardDataBuilder builder = data.Edit<CardData, CardDataBuilder>();
+            builder.Mod = this;
+            return builder;
+        }
+
+        private ClassDataBuilder TribeCopy(string oldName, string newName)
+        {
+            ClassData data = TryGet<ClassData>(oldName).InstantiateKeepName();
+            data.name = GUID + "." + newName;
+            ClassDataBuilder builder = data.Edit<ClassData, ClassDataBuilder>();
+            builder.Mod = this;
+            return builder;
+        }
+
+        internal T[] RemoveNulls<T>(T[] data) where T : DataFile
+        {
+            List<T> list = data.ToList();
+            list.RemoveAll(x => x == null || x.ModAdded == this);
+            return list.ToArray();
+        }
+
+        private T[] DataList<T>(params string[] names) where T : DataFile => names.Select((s) => TryGet<T>(s)).ToArray();
+
+
+    }
 
 }

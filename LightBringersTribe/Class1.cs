@@ -55,7 +55,7 @@ namespace LightBringers_Tribe
 			);
 			Debug.Log("[Lightbringers] Summon Graft Grunt Added"); //debug
 
-			//Status 1: is an instant effect, effects placed immediately and then removed
+			//Status 1: Instant Summon Graft Grunt
 			assets.Add(
 				StatusCopy("Instant Summon Fallow", "Instant Summon Graft Grunt") //Changes Instant Summon Fallow > Instant Summon Graft Grunt
 				.SubscribeToAfterAllBuildEvent(delegate (StatusEffectData data)
@@ -70,7 +70,7 @@ namespace LightBringers_Tribe
 			assets.Add(
 				StatusCopy("When Deployed Summon Wowee", "When Deployed Summon Graft Grunt")
 				.WithText("When deployed, summon {0}")
-				.WithTextInsert("<card=lordloko505.wildfrost.LightbringersTribe.graftGrunt>")
+				.WithTextInsert("<card=lordloko505.wildfrost.LightBringers.graftGrunt>")
 				.SubscribeToAfterAllBuildEvent(delegate (StatusEffectData data)
 				{
 					((StatusEffectApplyXWhenDeployed)data).effectToApply = TryGet<StatusEffectData>("Instant Summon Graft Grunt");
@@ -105,14 +105,36 @@ namespace LightBringers_Tribe
 
             //Status 5: Summon Tumble
             assets.Add(
-                StatusCopy("Summon Fallow", "tumble")
+                StatusCopy("Summon Fallow", "Summon Tumble")
                 .SubscribeToAfterAllBuildEvent(delegate (StatusEffectData data)
                 {
                     ((StatusEffectSummon)data).summonCard = TryGet<CardData>("tumble");
 
                 })
             );
-            Debug.Log("[Lightbringers] Summon Tumble"); //debug
+            Debug.Log("[Lightbringers] Summon Tumble Added"); //debug
+
+			//Status 6: Instant Summon Tumble
+            assets.Add(
+                StatusCopy("Instant Summon Fallow", "Instant Summon Tumble") //Changes Instant Summon Fallow > Instant Summon Tumble
+                .SubscribeToAfterAllBuildEvent(delegate (StatusEffectData data)
+                {
+                    ((StatusEffectInstantSummon)data).targetSummon = TryGet<StatusEffectSummon>("Summon Tumble");
+                })
+            );
+            Debug.Log("[Lightbringers] Instant Summon Tumble Added");
+
+			//Status 7: When Deployed Summon Tumble
+            assets.Add(
+                StatusCopy("When Deployed Summon Wowee", "When Deployed Summon Tumble")
+                .WithText("When deployed, summon {0}")
+                .WithTextInsert("<card=lordloko505.wildfrost.LightBringers.tumble>")
+                .SubscribeToAfterAllBuildEvent(delegate (StatusEffectData data)
+                {
+                    ((StatusEffectApplyXWhenDeployed)data).effectToApply = TryGet<StatusEffectData>("Instant Summon Tumble");
+                })
+            );
+            Debug.Log("[LightBringers] Summon Tumble When Deployed Added"); //debug
 
             //Card Code
 
@@ -239,7 +261,8 @@ namespace LightBringers_Tribe
 					data.startWithEffects = new CardData.StatusEffectStacks[]
 					{
 						SStack("Teeth",2),
-						SStack("On Turn Apply Teeth To Self",1)
+						SStack("On Turn Apply Teeth To Self",1),
+						SStack("When Deployed Summon Tumble",1)
 					};
 				})
 			);
@@ -312,8 +335,18 @@ namespace LightBringers_Tribe
 			//Card 11: Tangy
 			assets.Add(
 				new CardDataBuilder(this).CreateUnit("tangy", "Tangy")
-				.SetSprites("Tangy.png","Tangy BG.png")
-				.SetStats(5,2,3)
+				.SetSprites("Tangy.png", "Tangy BG.png")
+				.SetStats(5, 2, 3)
+				.SubscribeToAfterAllBuildEvent(delegate (CardData data)
+				{
+					data.startWithEffects = new CardData.StatusEffectStacks[]
+					{
+						SStack("On Turn Heal Allies", 2)
+					};
+
+
+				})
+
 			);
 
 			preLoaded = true;

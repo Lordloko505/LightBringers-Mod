@@ -34,21 +34,18 @@ namespace LightBringers_Tribe
 
 		private void CreateModAssets()
 		{
-			assets.Add(TribeCopy("Basic","Draw")
-				.WithFlag("Images/LightBringersFlag.png")
-				
-				
-				
-				
-				
-				
-				);
+			//assets.Add(TribeCopy("Basic","Draw")
+				//.WithFlag("Images/LightBringersFlag.png")
+                //.WithSelectSfxEvent(FMODUnity.RuntimeManager.PathToEventReference("event:/sfx/card/draw_multi"))
+
+                //);
+
 			//Status Effects
 			//Status 0: Summon Graft Grunt
 			assets.Add(
 				StatusCopy("Summon Fallow", "Summon Graft Grunt")
-				.SubscribeToAfterAllBuildEvent(delegate (StatusEffectData data)
-				{
+				.SubscribeToAfterAllBuildEvent<StatusEffectSummon>(data =>
+                {
 					((StatusEffectSummon)data).summonCard = TryGet<CardData>("graftGrunt");
 
 				})
@@ -58,9 +55,9 @@ namespace LightBringers_Tribe
 			//Status 1: Instant Summon Graft Grunt
 			assets.Add(
 				StatusCopy("Instant Summon Fallow", "Instant Summon Graft Grunt") //Changes Instant Summon Fallow > Instant Summon Graft Grunt
-				.SubscribeToAfterAllBuildEvent(delegate (StatusEffectData data)
+				.SubscribeToAfterAllBuildEvent<StatusEffectInstantSummon>(data =>
 				{
-					((StatusEffectInstantSummon)data).targetSummon = TryGet<StatusEffectSummon>("Summon Graft Grunt");
+					data.targetSummon = TryGet<StatusEffectSummon>("Summon Graft Grunt");
 				})
 			);
 			Debug.Log("[Lightbringers] Instant Summon Graft Grunt Added");
@@ -71,7 +68,7 @@ namespace LightBringers_Tribe
 				StatusCopy("When Deployed Summon Wowee", "When Deployed Summon Graft Grunt")
 				.WithText("When deployed, summon {0}")
 				.WithTextInsert("<card=lordloko505.wildfrost.LightBringers.graftGrunt>")
-				.SubscribeToAfterAllBuildEvent(delegate (StatusEffectData data)
+				.SubscribeToAfterAllBuildEvent<StatusEffectApplyXWhenDeployed>(data =>
 				{
 					((StatusEffectApplyXWhenDeployed)data).effectToApply = TryGet<StatusEffectData>("Instant Summon Graft Grunt");
 				})
@@ -83,8 +80,9 @@ namespace LightBringers_Tribe
 				StatusCopy("On Turn Apply Spice To AllyBehind", "On Turn Apply Block To AllyBehind")
 				.WithText("Apply {0} to ally behind")
 				.WithTextInsert("<keyword=block>")
-				.SubscribeToAfterAllBuildEvent(delegate (StatusEffectData data)
-				{
+				.SubscribeToAfterAllBuildEvent<StatusEffectApplyXOnTurn>(data =>
+
+                {
 					((StatusEffectApplyXOnTurn)data).effectToApply = TryGet<StatusEffectData>("Block");
 				})
 			);
@@ -95,8 +93,9 @@ namespace LightBringers_Tribe
 				StatusCopy("When Hit Apply Block To RandomAlly", "When Hit Apply Scrap To RandomAlly")
 				.WithText("When hit apply {0} to random ally")
 				.WithTextInsert("<keyword=scrap>")
-				.SubscribeToAfterAllBuildEvent(delegate (StatusEffectData data)
-				{
+				.SubscribeToAfterAllBuildEvent<StatusEffectApplyXWhenHit>(data =>
+
+                {
 					((StatusEffectApplyXWhenHit)data).effectToApply = TryGet<StatusEffectData>("Instant Add Scrap");
 
 				})
@@ -106,7 +105,7 @@ namespace LightBringers_Tribe
             //Status 5: Summon Tumble
             assets.Add(
                 StatusCopy("Summon Fallow", "Summon Tumble")
-                .SubscribeToAfterAllBuildEvent(delegate (StatusEffectData data)
+                .SubscribeToAfterAllBuildEvent<StatusEffectSummon>(data =>
                 {
                     ((StatusEffectSummon)data).summonCard = TryGet<CardData>("tumble");
 
@@ -117,7 +116,7 @@ namespace LightBringers_Tribe
 			//Status 6: Instant Summon Tumble
             assets.Add(
                 StatusCopy("Instant Summon Fallow", "Instant Summon Tumble") //Changes Instant Summon Fallow > Instant Summon Tumble
-                .SubscribeToAfterAllBuildEvent(delegate (StatusEffectData data)
+                .SubscribeToAfterAllBuildEvent<StatusEffectInstantSummon>(data =>
                 {
                     ((StatusEffectInstantSummon)data).targetSummon = TryGet<StatusEffectSummon>("Summon Tumble");
                 })
@@ -129,7 +128,7 @@ namespace LightBringers_Tribe
                 StatusCopy("When Deployed Summon Wowee", "When Deployed Summon Tumble")
                 .WithText("When deployed, summon {0}")
                 .WithTextInsert("<card=lordloko505.wildfrost.LightBringers.tumble>")
-                .SubscribeToAfterAllBuildEvent(delegate (StatusEffectData data)
+                .SubscribeToAfterAllBuildEvent<StatusEffectApplyXWhenDeployed>(data =>
                 {
                     ((StatusEffectApplyXWhenDeployed)data).effectToApply = TryGet<StatusEffectData>("Instant Summon Tumble");
                 })
@@ -145,8 +144,8 @@ namespace LightBringers_Tribe
 				.SetSprites("RadicalTerrance.png", "RadicalTerrance BG.png")
 				.SetStats(1, 99, 1)
 				.WithCardType("BossSmall")
-				.SubscribeToAfterAllBuildEvent(delegate (CardData data)
-				{
+                .SubscribeToAfterAllBuildEvent(data =>
+                {
 					data.startWithEffects = new CardData.StatusEffectStacks[]
 					{
 						SStack("On Turn Escape To Self", 1)
@@ -162,7 +161,7 @@ namespace LightBringers_Tribe
 			   .SetStats(5, 4, 0)
 			   .WithCardType("Friendly")
 			   .WithText("Triggers when an ally is healed")
-			   .SubscribeToAfterAllBuildEvent(delegate (CardData data)
+			   .SubscribeToAfterAllBuildEvent(data =>
 			   {
 				   data.startWithEffects = new CardData.StatusEffectStacks[]
 				   {
@@ -179,7 +178,7 @@ namespace LightBringers_Tribe
 				.SetSprites("Alphi.png", "Alphi BG.png")
 				.SetStats(8, 4, 4)
 				.WithCardType("Friendly")
-				.SubscribeToAfterAllBuildEvent(delegate (CardData data)
+				.SubscribeToAfterAllBuildEvent(data =>
 				{
 					data.startWithEffects = new CardData.StatusEffectStacks[]
 					{
@@ -211,7 +210,7 @@ namespace LightBringers_Tribe
 				.SetSprites("Nova.png", "Nova BG.png")
 				.SetStats(7, 0, 5)
 				.WithCardType("Friendly")
-				.SubscribeToAfterAllBuildEvent(delegate (CardData data)
+				.SubscribeToAfterAllBuildEvent(data =>
 				{
 					data.startWithEffects = new CardData.StatusEffectStacks[]
 					{
@@ -226,8 +225,8 @@ namespace LightBringers_Tribe
 				.SetStats(7, 2, 4)
 				.WithCardType("Friendly")
 				.SetTraits(TStack("Barrage",1))
-				.SubscribeToAfterAllBuildEvent(delegate (CardData data)
-				{
+                .SubscribeToAfterAllBuildEvent(data =>
+                {
 					data.startWithEffects = new CardData.StatusEffectStacks[]
 					{
 						SStack("When Hit Apply Scrap To RandomAlly", 1)
@@ -241,7 +240,7 @@ namespace LightBringers_Tribe
 				.SetStats(null, 3, 0)
 				.WithCardType("Clunker")
 				.SetTraits(TStack("Smackback", 1))
-                .SubscribeToAfterAllBuildEvent(delegate (CardData data)
+                .SubscribeToAfterAllBuildEvent(data =>
                 {
                     data.startWithEffects = new CardData.StatusEffectStacks[]
                     {
@@ -256,7 +255,7 @@ namespace LightBringers_Tribe
 				.SetSprites("Rough.png", "Rough BG.png")
 				.SetStats(4, 1, 2)
 				.WithCardType("Friendly")
-				.SubscribeToAfterAllBuildEvent(delegate (CardData data)
+				.SubscribeToAfterAllBuildEvent(data =>
 				{
 					data.startWithEffects = new CardData.StatusEffectStacks[]
 					{
@@ -273,7 +272,7 @@ namespace LightBringers_Tribe
 				.SetStats(5,1,2)
 				.WithCardType("Summoned")
 				.SetTraits(TStack("Frontline",1))
-				.SubscribeToAfterAllBuildEvent(delegate (CardData data)
+				.SubscribeToAfterAllBuildEvent(data =>
 				{
 					data.startWithEffects = new CardData.StatusEffectStacks[]
 					{
@@ -291,7 +290,7 @@ namespace LightBringers_Tribe
 				.SetStats(10, 4, 8)
 				.WithCardType("Friendly")
 				.SetTraits(TStack("Bombard 1", 1))
-				.SubscribeToAfterAllBuildEvent(delegate (CardData data)
+				.SubscribeToAfterAllBuildEvent(data =>
 				{
 					data.startWithEffects = new CardData.StatusEffectStacks[]
 					{
@@ -306,7 +305,7 @@ namespace LightBringers_Tribe
 				.SetSprites("TheBoy.png", "TheBoy BG.png")
 				.SetStats(8, 1, 4)
 				.WithCardType("Friendly")
-				.SubscribeToAfterAllBuildEvent(delegate (CardData data)
+				.SubscribeToAfterAllBuildEvent(data =>
 				{
 					data.startWithEffects = new CardData.StatusEffectStacks[]
 					{
@@ -323,8 +322,8 @@ namespace LightBringers_Tribe
 				.IsPet("yes")
 				.WithCardType("Friendly")
 				.SetTraits(TStack("Aimless", 1), TStack("Pull", 1))
-				.SubscribeToAfterAllBuildEvent(delegate(CardData data)
-				{
+                .SubscribeToAfterAllBuildEvent(data =>
+                {
 					data.startWithEffects = new CardData.StatusEffectStacks[]
 					{
 						SStack("On Hit Equal Overload To Target",1)
@@ -337,7 +336,7 @@ namespace LightBringers_Tribe
 				new CardDataBuilder(this).CreateUnit("tangy", "Tangy")
 				.SetSprites("Tangy.png", "Tangy BG.png")
 				.SetStats(5, 2, 3)
-				.SubscribeToAfterAllBuildEvent(delegate (CardData data)
+				.SubscribeToAfterAllBuildEvent(data =>
 				{
 					data.startWithEffects = new CardData.StatusEffectStacks[]
 					{
@@ -351,17 +350,24 @@ namespace LightBringers_Tribe
 
 			preLoaded = true;
 		}
-
+		public static WildfrostMod instance;
 		protected override void Load()
 		{
+			Instance = this;
 			if (!preLoaded) { CreateModAssets(); } //Builders arent made again upon 2nd load
 			base.Load();
-		}
+
+            GameMode gameMode = TryGet<GameMode>("GameModeNormal"); //GameModeNormal is the standard game mode. 
+            gameMode.classes = gameMode.classes.Append(TryGet<ClassData>("Draw")).ToArray();
+        }
 
 		protected override void Unload()
 		{
 			base.Unload();
-		}
+
+            GameMode gameMode = TryGet<GameMode>("GameModeNormal");
+            gameMode.classes = RemoveNulls(gameMode.classes); //Without this, a non-restarted game would crash on tribe selection
+        }
 
 		public override List<T> AddAssets<T, Y>() //inside base.Load(), called mutltiple times, each time T+Y are different DataFile and DataFileBuilders
 		{
